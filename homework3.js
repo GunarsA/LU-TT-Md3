@@ -5,6 +5,11 @@
 function capitalize(str) {
   // implement a function to capitalize the first letter of every word in str
   // your code goes here
+  const arr = str.split(" ");
+  for (var i = 0; i < arr.length; i++) {
+    arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
+  }
+  str = arr.join(" ");
   return str;
 }
 
@@ -17,9 +22,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
     // for every item in the activities - every piece of statistic info
     let region;
     if (activities[i].Location.ParentId)
-      region = capitalize(
-        activities[i].Location.ParentId
-      ); // read region from an activity
+      region = capitalize(activities[i].Location.ParentId);
+    // read region from an activity
     else region = capitalize(activities[i].Location.Id); // read polling station Id from an activity
     let station = activities[i].Location.Name; // read polling station from an activity
     if (region && !(region in lookup)) {
