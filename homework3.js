@@ -4,13 +4,144 @@
 
 function capitalize(str) {
   // implement a function to capitalize the first letter of every word in str
-  // your code goes here
-  const arr = str.split(" ");
-  for (var i = 0; i < arr.length; i++) {
-    arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
+  // TODO your code goes here
+  return str
+    .split(" ")
+    .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
+    .join(" ");
+}
+
+function updatePollingStations(lookup, region) {
+  let stations = [];
+  if (region) {
+    stations = Object.keys(lookup[region]).sort();
+  } else {
+    for (let i in lookup) {
+      stations = stations.concat(Object.keys(lookup[i]));
+    }
+    stations.sort();
   }
-  str = arr.join(" ");
-  return str;
+
+  const station_s = document.getElementById("polling-list");
+  const opt = document.createElement("option");
+  opt.textContent = "All";
+  opt.value = "";
+  station_s.replaceChildren(opt);
+  for (let i in stations) {
+    const opt = document.createElement("option");
+    opt.textContent = stations[i];
+    opt.value = stations[i];
+    station_s.appendChild(opt);
+  }
+
+  return;
+}
+
+function getCell(value, type) {
+  const cell = document.createElement(type);
+  cell.textContent = value;
+  return cell;
+}
+
+function getRow(station) {
+  const row = document.createElement("tr");
+
+  row.appendChild(
+    getCell(
+      station.Location.ParentId
+        ? capitalize(station.Location.ParentId)
+        : capitalize(station.Location.Id),
+      "td"
+    )
+  );
+  row.appendChild(getCell(station.Location.Name, "td"));
+  row.appendChild(getCell(station.Location.Address, "td"));
+  row.appendChild(getCell(station.Location.VoterCount, "td"));
+  row.appendChild(getCell(station.TotalStatistic.Count, "td"));
+  row.appendChild(getCell(station.TotalStatistic.Percentage, "td"));
+
+  return row;
+}
+
+function rangeCheckHelper(station, vote_from_s, vote_until_s) {
+  if (
+    (!vote_from_s.value || station.Location.VoterCount >= vote_from_s.value) &&
+    (!vote_until_s.value || station.Location.VoterCount <= vote_until_s.value)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function generateTable() {
+  const region_s = document.querySelector("#region-list");
+  const station_s = document.querySelector("#polling-list");
+  const vote_from_s = document.querySelector("#vote-from");
+  const vote_until_s = document.querySelector("#vote-until");
+  const total_s = document.querySelector("#total");
+  const election_day_s = document.querySelector("#election_day");
+  const table_s = document.querySelector("table");
+
+  if (isNaN(vote_from_s.value) || isNaN(vote_until_s.value)) {
+    alert("You must enter numbers!");
+    return;
+  }
+
+  table_s.replaceChildren();
+
+  const thead = document.createElement("thead");
+  const row = document.createElement("tr");
+  row.appendChild(getCell("Region", "th"))
+  row.appendChild(getCell("Name", "th"));
+  row.appendChild(getCell("Address", "th"));
+  row.appendChild(getCell("Total Voters", "th"));
+  if(total_s.checked){
+    row.appendChild(getCell("Vote Count", "th"));
+    row.appendChild(getCell("Percentage Voted", "th"));
+  }
+  else {
+    row.appendChild(getCell("Vote Count on Election Day", "th"));
+    row.appendChild(getCell("Percentage Voted on Election Day", "th"));
+  }
+  thead.appendChild(row);
+  table_s.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+
+  activities.sort((a, b) => {
+    if (a.Location.ParentId && b.Location.ParentId) {
+      return a.Location.ParentId > b.Location.ParentId ? 1 : -1;
+    } else {
+      return a.Location.Name > b.Location.Name ? 1 : -1;
+    }
+  });
+
+  if (station_s.value) {
+    const station = activities.find(
+      (element) => element.Location.Name === station_s.value
+    );
+    if (rangeCheckHelper(station, vote_from_s, vote_until_s)) {
+      tbody.appendChild(getRow(station));
+    }
+  } else if (region_s.value) {
+    for (const i of activities) {
+      if (capitalize(i.Location.ParentId ?? "") === region_s.value) {
+        if (rangeCheckHelper(i, vote_from_s, vote_until_s)) {
+          tbody.appendChild(getRow(i));
+        }
+      }
+    }
+  } else {
+    for (const i of activities) {
+      if (rangeCheckHelper(i, vote_from_s, vote_until_s)) {
+        tbody.appendChild(getRow(i));
+      }
+    }
+  }
+
+  table_s.appendChild(tbody);
+
+  return;
 }
 
 window.addEventListener("DOMContentLoaded", (event) => {
@@ -54,5 +185,13 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
   // console.log(stations); // uncomment this line if you want to see the result in the console
 
-  // write your code to fill the polling stations select element
+  // TODO write your code to fill the polling stations select element
+  updatePollingStations(lookup);
+
+  region_s.addEventListener("change", function () {
+    updatePollingStations(lookup, this.value);
+  });
+
+  const button_s = document.querySelector("#show-stats");
+  button_s.addEventListener("click", generateTable);
 });

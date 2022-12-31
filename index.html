@@ -37,7 +37,9 @@ Enter your name, surname and student id number here
     </div>
     <div>
       <label for="polling-list">Polling station:</label>
-      <select id="polling-list"></select>
+      <select id="polling-list">
+        <option value="">All</option>
+      </select>
     </div>
     <div>
       <label for="vote-from">Voters from:</label>
@@ -60,33 +62,37 @@ Enter your name, surname and student id number here
     <div id="buttons">
       <button id="show-stats">Show statistics</button>
     </div>
-    <table>
+    <table id="table">
       <!--EXAMPLE START-->
       <!--This is an example result. The example should be removed in the final homework solution. -->
-      <tr>
-        <th>Region</th>
-        <th>Name</th>
-        <th>Address</th>
-        <th>Total Voters</th>
-        <th>Vote Count</th>
-        <th>Percentage Voted</th>
-      </tr>
-      <tr>
-        <td>Riga</td>
-        <td>RĪGAS VALSTS 3. ĢIMNĀZIJA</td>
-        <td>Grēcinieku iela 10, Rīga</td>
-        <td>1318</td>
-        <td>615</td>
-        <td>46.66%</td>
-      </tr>
-      <tr>
-        <td>Riga</td>
-        <td>RĪGAS 34. VIDUSSKOLA</td>
-        <td>Vircavas iela 7, Rīga</td>
-        <td>3326</td>
-        <td>1285</td>
-        <td>38.63%</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Region</th>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Total Voters</th>
+          <th>Vote Count</th>
+          <th>Percentage Voted</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Riga</td>
+          <td>RĪGAS VALSTS 3. ĢIMNĀZIJA</td>
+          <td>Grēcinieku iela 10, Rīga</td>
+          <td>1318</td>
+          <td>615</td>
+          <td>46.66%</td>
+        </tr>
+        <tr>
+          <td>Riga</td>
+          <td>RĪGAS 34. VIDUSSKOLA</td>
+          <td>Vircavas iela 7, Rīga</td>
+          <td>3326</td>
+          <td>1285</td>
+          <td>38.63%</td>
+        </tr>
+      </tbody>
       <!--EXAMPLE END-->
     </table>
   </div>
