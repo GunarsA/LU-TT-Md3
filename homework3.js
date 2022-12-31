@@ -43,7 +43,7 @@ function getCell(value, type) {
   return cell;
 }
 
-function getRow(station) {
+function getRow(station, state) {
   const row = document.createElement("tr");
 
   row.appendChild(
@@ -57,8 +57,15 @@ function getRow(station) {
   row.appendChild(getCell(station.Location.Name, "td"));
   row.appendChild(getCell(station.Location.Address, "td"));
   row.appendChild(getCell(station.Location.VoterCount, "td"));
-  row.appendChild(getCell(station.TotalStatistic.Count, "td"));
-  row.appendChild(getCell(station.TotalStatistic.Percentage, "td"));
+  if (state) {
+    row.appendChild(getCell(station.TotalStatistic.Count, "td"));
+    row.appendChild(getCell(station.TotalStatistic.Percentage, "td"));
+  } else {
+    row.appendChild(getCell(station.ElectionDayTotalStatistic.Count, "td"));
+    row.appendChild(
+      getCell(station.ElectionDayTotalStatistic.Percentage, "td")
+    );
+  }
 
   return row;
 }
@@ -82,8 +89,13 @@ function generateTable() {
   const election_day_s = document.querySelector("#election_day");
   const table_s = document.querySelector("table");
 
-  if (isNaN(vote_from_s.value) || isNaN(vote_until_s.value)) {
-    alert("You must enter numbers!");
+  if (
+    isNaN(vote_from_s.value) ||
+    isNaN(vote_until_s.value) ||
+    vote_from_s.value < 0 ||
+    vote_until_s.value < 0
+  ) {
+    alert("You must enter positive values!");
     return;
   }
 
@@ -91,22 +103,21 @@ function generateTable() {
 
   const thead = document.createElement("thead");
   const row = document.createElement("tr");
-  row.appendChild(getCell("Region", "th"))
+  row.appendChild(getCell("Region", "th"));
   row.appendChild(getCell("Name", "th"));
   row.appendChild(getCell("Address", "th"));
   row.appendChild(getCell("Total Voters", "th"));
-  if(total_s.checked){
+  if (total_s.checked) {
     row.appendChild(getCell("Vote Count", "th"));
     row.appendChild(getCell("Percentage Voted", "th"));
-  }
-  else {
+  } else {
     row.appendChild(getCell("Vote Count on Election Day", "th"));
     row.appendChild(getCell("Percentage Voted on Election Day", "th"));
   }
   thead.appendChild(row);
   table_s.appendChild(thead);
 
-  const tbody = document.createElement('tbody');
+  const tbody = document.createElement("tbody");
 
   activities.sort((a, b) => {
     if (a.Location.ParentId && b.Location.ParentId) {
@@ -121,20 +132,32 @@ function generateTable() {
       (element) => element.Location.Name === station_s.value
     );
     if (rangeCheckHelper(station, vote_from_s, vote_until_s)) {
-      tbody.appendChild(getRow(station));
+      if (total_s.checked) {
+        tbody.appendChild(getRow(station, true));
+      } else {
+        tbody.appendChild(getRow(station, false));
+      }
     }
   } else if (region_s.value) {
     for (const i of activities) {
       if (capitalize(i.Location.ParentId ?? "") === region_s.value) {
         if (rangeCheckHelper(i, vote_from_s, vote_until_s)) {
-          tbody.appendChild(getRow(i));
+          if (total_s.checked) {
+            tbody.appendChild(getRow(i, true));
+          } else {
+            tbody.appendChild(getRow(i, false));
+          }
         }
       }
     }
   } else {
     for (const i of activities) {
       if (rangeCheckHelper(i, vote_from_s, vote_until_s)) {
-        tbody.appendChild(getRow(i));
+        if (total_s.checked) {
+          tbody.appendChild(getRow(i, true));
+        } else {
+          tbody.appendChild(getRow(i, false));
+        }
       }
     }
   }
