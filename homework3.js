@@ -17,7 +17,7 @@ function updatePollingStations(lookup, region) {
     stations = Object.keys(lookup[region]).sort();
   } else {
     for (let i in lookup) {
-      stations = stations.concat(Object.keys(lookup[i]));
+      stations.push(...Object.keys(lookup[i]));
     }
     stations.sort();
   }
@@ -86,7 +86,7 @@ function generateTable() {
   const vote_from_s = document.querySelector("#vote-from");
   const vote_until_s = document.querySelector("#vote-until");
   const total_s = document.querySelector("#total");
-  const election_day_s = document.querySelector("#election_day");
+  // const election_day_s = document.querySelector("#election_day");
   const table_s = document.querySelector("table");
 
   if (
@@ -119,45 +119,27 @@ function generateTable() {
 
   const tbody = document.createElement("tbody");
 
-  activities.sort((a, b) => {
-    if (a.Location.ParentId && b.Location.ParentId) {
-      return a.Location.ParentId > b.Location.ParentId ? 1 : -1;
-    } else {
-      return a.Location.Name > b.Location.Name ? 1 : -1;
-    }
-  });
-
+  let stations = [];
   if (station_s.value) {
-    const station = activities.find(
-      (element) => element.Location.Name === station_s.value
+    stations.push(
+      activities.find((element) => element.Location.Name === station_s.value)
     );
-    if (rangeCheckHelper(station, vote_from_s, vote_until_s)) {
-      if (total_s.checked) {
-        tbody.appendChild(getRow(station, true));
-      } else {
-        tbody.appendChild(getRow(station, false));
-      }
-    }
   } else if (region_s.value) {
     for (const i of activities) {
       if (capitalize(i.Location.ParentId ?? "") === region_s.value) {
-        if (rangeCheckHelper(i, vote_from_s, vote_until_s)) {
-          if (total_s.checked) {
-            tbody.appendChild(getRow(i, true));
-          } else {
-            tbody.appendChild(getRow(i, false));
-          }
-        }
+        stations.push(i);
       }
     }
   } else {
-    for (const i of activities) {
-      if (rangeCheckHelper(i, vote_from_s, vote_until_s)) {
-        if (total_s.checked) {
-          tbody.appendChild(getRow(i, true));
-        } else {
-          tbody.appendChild(getRow(i, false));
-        }
+    stations = activities;
+  }
+
+  for (const i of stations) {
+    if (rangeCheckHelper(i, vote_from_s, vote_until_s)) {
+      if (total_s.checked) {
+        tbody.appendChild(getRow(i, true));
+      } else {
+        tbody.appendChild(getRow(i, false));
       }
     }
   }
@@ -213,6 +195,14 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
   region_s.addEventListener("change", function () {
     updatePollingStations(lookup, this.value);
+  });
+
+  activities.sort((a, b) => {
+    if (a.Location.ParentId && b.Location.ParentId) {
+      return a.Location.ParentId > b.Location.ParentId ? 1 : -1;
+    } else {
+      return a.Location.Name > b.Location.Name ? 1 : -1;
+    }
   });
 
   const button_s = document.querySelector("#show-stats");
