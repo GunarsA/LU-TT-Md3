@@ -1,5 +1,5 @@
 ﻿/*
- * Enter your name, surname and student id number here
+ Gunārs Ābeltiņš ga22008
  */
 
 function capitalize(str) {
@@ -93,9 +93,12 @@ function generateTable() {
     isNaN(vote_from_s.value) ||
     isNaN(vote_until_s.value) ||
     vote_from_s.value < 0 ||
-    vote_until_s.value < 0
+    vote_until_s.value < 0 ||
+    vote_from_s.value % 1 !== 0 ||
+    vote_until_s.value % 1 !== 0
+
   ) {
-    alert("You must enter positive values!");
+    alert("You must enter integer values!");
     return;
   }
 
